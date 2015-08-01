@@ -1,5 +1,5 @@
 common: &default_settings
-  app_name: RailsBootstrap
+  app_name: Unstuckme
   audit_log:
     enabled: false
   browser_monitoring:
@@ -28,8 +28,8 @@ test:
 production:
   <<: *default_settings
   monitor_mode: true
-  app_name: RailsBootstrap (Production)
+  app_name: Unstuckme (Production)
 staging:
   <<: *default_settings
-  app_name: RailsBootstrap (Staging)
+  app_name: Unstuckme (Staging)
   monitor_mode: true

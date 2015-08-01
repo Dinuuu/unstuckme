@@ -1,4 +1,4 @@
-RailsBootstrap::Application.routes.draw do
+Unstuckme::Application.routes.draw do
 
   # root to: 'application#index'
 
