@@ -12,6 +12,17 @@ describe V1::QuestionsController do
       it 'creates a new Question' do
         expect { post :create, question: question_attributes }.to change(Question, :count).by(1)
       end
+      context 'when the user doesn\'t exists' do
+        it 'create a new User' do
+          expect { post :create, question: question_attributes }.to change(User, :count).by(1)
+        end
+      end
+      context 'when the user exists' do
+        let!(:user) { User.create(device_token: question_attributes[:creator]) }
+        it 'does not creates a new User' do
+          expect { post :create, question: question_attributes }.not_to change { User.count }
+        end
+      end
     end
   end
 
@@ -65,6 +76,17 @@ describe V1::QuestionsController do
       end
       it 'creates answers as many as questions you vote on' do
         expect { post :vote, votation: vote_params }.to change(Answer, :count).by(3)
+      end
+      context 'when the user doesn\'t exists' do
+        it 'create a new User' do
+          expect { post :vote, votation: vote_params }.to change(User, :count).by(1)
+        end
+      end
+      context 'when the user exists' do
+        let!(:user) { User.create(device_token: vote_params[:voter]) }
+        it 'does not creates a new User' do
+          expect { post :vote, votation: vote_params }.not_to change { User.count }
+        end
       end
     end
   end

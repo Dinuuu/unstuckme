@@ -1,7 +1,9 @@
 module V1
 	class QuestionsController < ApplicationController
     include PaginationHelper
+    before_action :check_user_creation, only: [:create, :vote]
     before_action :check_ownership, only: [:destroy]
+
 
     def create
       @question = Question.new(questions_params)
@@ -27,6 +29,7 @@ module V1
 
     def vote
       voter = vote_params[:voter]
+      return render status: :bad_request, json: {} unless voter.present?
       vote_params[:votes].each do |vote|
         VoteQuestionContext.new(voter, vote).make_votation
       end
@@ -43,6 +46,11 @@ module V1
     end
 
     private
+
+    def check_user_creation
+      user_device = params[:question].present? ? questions_params[:creator] : vote_params[:voter]
+      User.create(device_token: user_device) if user_device.present?
+    end
 
     def check_ownership
       render status: :forbidden, json: {} unless params[:creator] == question.creator
