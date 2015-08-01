@@ -4,6 +4,8 @@ Unstuckme::Application.routes.draw do
     resources :questions, only: [:create, :destroy, :show, :index] do
     	collection do
     		post :vote
+    		get :my_questions
+    		get :my_answers
     	end
     end
   end

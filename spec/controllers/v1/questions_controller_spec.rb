@@ -20,7 +20,7 @@ describe V1::QuestionsController do
       let!(:non_exclusive_questions) { create_list :question, 10, exclusive: false, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }] }
 
       let!(:exclusive_questions) { create_list :question, 5, exclusive: true, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }] }
-      before { get :index }
+      before { get :index, user: 'MyDeviceToken' }
       it 'returns all the non exlusive questions' do
         expect(body.all? { |q| q['exclusive'] }).to eq false
       end
@@ -65,6 +65,35 @@ describe V1::QuestionsController do
       end
       it 'creates answers as many as questions you vote on' do
         expect { post :vote, votation: vote_params }.to change(Answer, :count).by(3)
+      end
+    end
+  end
+
+  describe '#my_questions' do
+    context 'when asking for the results of my questions' do
+      let!(:questions) { create_list :question, 10, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }], creator: 'myDeviceToken' }
+      before { get :my_questions, user: 'myDeviceToken' }
+      it 'returns http ok' do
+        expect(response.status).to eq 200
+      end
+      it 'returns 10 questions' do
+        expect(body.size).to eq 10
+      end
+    end
+  end
+
+  describe '#my_answers' do
+    context 'when asking for the questions I\'ve answered' do
+      let!(:questions) { create_list :question, 10, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }] }
+      let!(:answer1) { Answer.create(question: questions[0], option: questions[0].options[1], voter: 'myDeviceToken')}
+      let!(:answer2) { Answer.create(question: questions[2], option: questions[2].options[0], voter: 'myDeviceToken')}
+      let!(:answer3) { Answer.create(question: questions[5], option: questions[5].options[1], voter: 'myDeviceToken')}
+      before { get :my_answers, user: 'myDeviceToken' }
+      it 'returns http ok' do
+        expect(response.status).to eq 200
+      end
+      it 'returns 3 questions' do
+        expect(body.size).to eq 3
       end
     end
   end

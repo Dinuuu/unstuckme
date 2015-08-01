@@ -13,7 +13,7 @@ module V1
     end
 
     def index
-      render status: :ok, json: paginate(QuestionQuery.new(params[:device_token]).find)
+      render status: :ok, json: paginate(QuestionQuery.new(user_params[:user]).find)
     end
 
     def show
@@ -35,6 +35,16 @@ module V1
       render status: :created, json: {}
     end
 
+    def my_questions
+      render status: :ok, json: Question.for_user(user_params[:user])
+    end
+
+    def my_answers
+      byebug
+      render status: :ok, json: Question.where(id: Answer.where(voter: user_params[:user])
+                                        .pluck(:question_id))
+    end
+
     private
 
     def check_ownership
@@ -51,6 +61,11 @@ module V1
 
     def vote_params
       params.require(:votation).permit(:voter, votes:[])
+    end
+
+    def user_params
+      params.require(:user)
+      params.permit(:user)
     end
 	end
 end

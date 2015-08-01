@@ -6,4 +6,6 @@ class Question < ActiveRecord::Base
   validates :creator, presence: true
   validates :exclusive, inclusion: { in: [true, false] }
   validates :options, length: { minimum: MIN_OPTIONS, maximum: MAX_OPTIONS }
+
+  scope :for_user, -> (user) { where(creator: user) }
 end
