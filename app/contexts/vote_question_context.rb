@@ -12,6 +12,7 @@ class VoteQuestionContext
     if question.active?
       new_state = question.total_votes + 1 < question.limit
       option.question.update_attributes(total_votes: question.total_votes + 1, active: new_state)
+      LimitPushContext.new(question.id).send unless new_state
     end
     Answer.create(option_id: option.id, question_id: option.question_id, voter: voter)
   end
