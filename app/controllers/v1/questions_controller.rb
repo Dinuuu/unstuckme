@@ -8,6 +8,7 @@ module V1
     def create
       @question = Question.new(questions_params)
       if question.save
+        @user.update_attributes(questions_asked: @user.questions_asked + 1)
         render status: :created, json: question
       else
         render json: { errors: question.errors }, status: :precondition_failed
@@ -31,7 +32,7 @@ module V1
       voter = vote_params[:voter]
       return render status: :bad_request, json: {} unless voter.present?
       vote_params[:votes].each do |vote|
-        VoteQuestionContext.new(voter, vote).make_votation
+        VoteQuestionContext.new(@user, vote).make_votation
       end
       render status: :created, json: {}
     end
@@ -49,7 +50,7 @@ module V1
 
     def check_user_creation
       user_device = params[:question].present? ? questions_params[:creator] : vote_params[:voter]
-      User.create(device_token: user_device) if user_device.present?
+      @user = User.find_or_create_by(device_token: user_device) if user_device.present?
     end
 
     def check_ownership

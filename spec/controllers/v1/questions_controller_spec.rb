@@ -22,6 +22,9 @@ describe V1::QuestionsController do
         it 'does not creates a new User' do
           expect { post :create, question: question_attributes }.not_to change { User.count }
         end
+        it 'increments the count of questions_asked by 1' do
+          expect { post :create, question: question_attributes }.to change { user.reload.questions_asked }.by(1)
+        end
       end
     end
   end
@@ -67,7 +70,8 @@ describe V1::QuestionsController do
   end
 
   describe '#vote' do
-    let!(:questions) { create_list :question, 10, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }] }
+    let!(:user) { User.create(device_token: 'QuestionerToken')}
+    let!(:questions) { create_list :question, 10, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }], creator: 'QuestionerToken' }
     let!(:vote_params) { { voter: 'VoterDeviceToken', votes: [questions[0].options.first.id, questions[4].options.first.id, questions[6].options.first.id] } }
     context 'when voting into a question' do
       it 'returns http created' do
@@ -77,15 +81,21 @@ describe V1::QuestionsController do
       it 'creates answers as many as questions you vote on' do
         expect { post :vote, votation: vote_params }.to change(Answer, :count).by(3)
       end
+      it 'increments the count of my_questions_answers of the questioner' do
+        expect { post :vote, votation: vote_params }.to change { User.find_by_device_token('QuestionerToken').my_questions_answers }.by(3)
+      end 
       context 'when the user doesn\'t exists' do
         it 'create a new User' do
           expect { post :vote, votation: vote_params }.to change(User, :count).by(1)
         end
       end
       context 'when the user exists' do
-        let!(:user) { User.create(device_token: vote_params[:voter]) }
+        let!(:user2) { User.create(device_token: vote_params[:voter]) }
         it 'does not creates a new User' do
           expect { post :vote, votation: vote_params }.not_to change { User.count }
+        end
+        it 'increments the count of answered questions of the voter' do
+          expect { post :vote, votation: vote_params }.to change { User.find_by_device_token('VoterDeviceToken').answered_questions }.by(3)
         end
       end
     end
