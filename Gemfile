@@ -31,6 +31,7 @@ gem 'jquery-rails'
 gem 'loadjs'
 
 gem 'carrierwave'
+gem 'versionist'
 
 gem 'turbolinks'
 
@@ -61,6 +62,7 @@ gem 'sidekiq-failures'
 gem 'sidekiq_mailer'
 
 gem 'pundit'
+gem 'kaminari'
 
 # Exceptions Report
 gem 'airbrake'

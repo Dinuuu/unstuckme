@@ -367,6 +367,10 @@ GEM
       execjs (>= 0.3.0)
       json (>= 1.8.0)
     uniform_notifier (1.9.0)
+    versionist (1.4.1)
+      activesupport (>= 3)
+      railties (>= 3)
+      yard (~> 0.7)
     warden (1.2.3)
       rack (>= 1.0)
     web-console (2.1.3)
@@ -379,6 +383,7 @@ GEM
       crack (>= 0.3.2)
     xpath (2.0.0)
       nokogiri (~> 1.3)
+    yard (0.8.7.6)
 
 PLATFORMS
   ruby
@@ -406,6 +411,7 @@ DEPENDENCIES
   inherited_resources
   jquery-rails
   jquery-turbolinks
+  kaminari
   launchy
   less-rails
   loadjs
@@ -439,5 +445,9 @@ DEPENDENCIES
   turbolinks
   twitter-bootstrap-rails
   uglifier
+  versionist
   web-console
   webmock
+
+BUNDLED WITH
+   1.10.6
