@@ -9,6 +9,7 @@ class QuestionQuery
     @relation.where(exclusive: false)
              .where.not(id: Answer.where(voter: user).pluck(:question_id))
              .where.not(creator: user)
+             .where(active: true)
              .includes(:options)
   end
 end

@@ -28,9 +28,7 @@ module V1
     def vote
       voter = vote_params[:voter]
       vote_params[:votes].each do |vote|
-        option = Option.find(vote)
-        option.update_attributes(votes: option.votes + 1)
-        Answer.create(option_id: option.id, question_id: option.question_id, voter: voter)
+        VoteQuestionContext.new(voter, vote).make_votation
       end
       render status: :created, json: {}
     end
@@ -55,7 +53,7 @@ module V1
     end
 
     def questions_params
-      params.require(:question).permit(:creator, :exclusive, options_attributes: [:option])
+      params.require(:question).permit(:creator, :exclusive, :limit, options_attributes: [:option])
     end
 
     def vote_params
