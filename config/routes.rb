@@ -1,7 +1,11 @@
 Unstuckme::Application.routes.draw do
 
   api_version(module: "V1", path: { value: 'api/v1' }, defaults: { format: :json })  do
-    resources :questions, only: [:create, :destroy, :show, :index]
+    resources :questions, only: [:create, :destroy, :show, :index] do
+    	collection do
+    		post :vote
+    	end
+    end
   end
   # root to: 'application#index'
 

@@ -54,4 +54,18 @@ describe V1::QuestionsController do
       end
     end
   end
+
+  describe '#vote' do
+    let!(:questions) { create_list :question, 10, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }] }
+    let!(:vote_params) { { voter: 'VoterDeviceToken', votes: [questions[0].options.first.id, questions[4].options.first.id, questions[6].options.first.id] } }
+    context 'when voting into a question' do
+      it 'returns http created' do
+        post :vote, votation: vote_params
+        expect(response.status).to eq 201
+      end
+      it 'creates answers as many as questions you vote on' do
+        expect { post :vote, votation: vote_params }.to change(Answer, :count).by(3)
+      end
+    end
+  end
 end

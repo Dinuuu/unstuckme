@@ -13,8 +13,7 @@ module V1
     end
 
     def index
-      questions = Question.where(exclusive: false).includes(:options)
-      render status: :ok, json: paginate(questions)
+      render status: :ok, json: paginate(QuestionQuery.new(params[:device_token]).find)
     end
 
     def show
@@ -24,6 +23,16 @@ module V1
     def destroy
       question.destroy
       render status: :ok, json: {}
+    end
+
+    def vote
+      voter = vote_params[:voter]
+      vote_params[:votes].each do |vote|
+        option = Option.find(vote)
+        option.update_attributes(votes: option.votes + 1)
+        Answer.create(option_id: option.id, question_id: option.question_id, voter: voter)
+      end
+      render status: :created, json: {}
     end
 
     private
@@ -38,6 +47,10 @@ module V1
 
     def questions_params
       params.require(:question).permit(:creator, :exclusive, options_attributes: [:option])
+    end
+
+    def vote_params
+      params.require(:votation).permit(:voter, votes:[])
     end
 	end
 end

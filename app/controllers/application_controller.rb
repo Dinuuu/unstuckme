@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
 
-  private 
+  private
 
   def record_not_found
   	render status: :not_found, json: {}
