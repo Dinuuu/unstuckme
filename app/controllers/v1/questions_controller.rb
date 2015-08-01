@@ -36,13 +36,12 @@ module V1
     end
 
     def my_questions
-      render status: :ok, json: Question.for_user(user_params[:user])
+      render status: :ok, json: paginate(Question.for_user(user_params[:user]))
     end
 
     def my_answers
-      byebug
-      render status: :ok, json: Question.where(id: Answer.where(voter: user_params[:user])
-                                        .pluck(:question_id))
+      render status: :ok, json: paginate(Question.where(id: Answer.where(voter: user_params[:user])
+                                         .pluck(:question_id)))
     end
 
     private
