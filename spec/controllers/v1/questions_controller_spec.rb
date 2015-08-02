@@ -144,7 +144,7 @@ describe V1::QuestionsController do
 
   describe '#unlock' do
     let!(:question) { create :question, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }] }
-    let!(:user) { User.create(device_token: 'MyToken', credits: Question::UNLOCK_CREDITS) }
+    let!(:user) { User.create(device_token: 'MyToken') }
     before { @request.headers['TOKEN'] = 'MyToken'}
     context 'when unlocking a locked answer' do
       it 'increments the amount of unlocked questions' do

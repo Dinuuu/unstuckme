@@ -1,7 +1,8 @@
 class Question < ActiveRecord::Base
   MIN_OPTIONS = 2
   MAX_OPTIONS = 4
-  UNLOCK_CREDITS = 5
+  UNLOCK_CREDITS_ANSWERED = 2
+  UNLOCK_CREDITS_ASKED = 5
   has_many :options, inverse_of: :question, dependent: :destroy
   accepts_nested_attributes_for :options
   validates :creator, :limit, presence: true
@@ -15,6 +16,10 @@ class Question < ActiveRecord::Base
 
 
   after_initialize :initialize_fields
+
+  def credits_for_unlock(user)
+    user.device_token == creator ? UNLOCK_CREDITS_ASKED : UNLOCK_CREDITS_ANSWERED
+  end
 
   private
 

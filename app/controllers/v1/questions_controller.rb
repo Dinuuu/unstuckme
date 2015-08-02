@@ -44,9 +44,10 @@ module V1
     end
 
     def unlock
-      return render status: :precondition_failed, json: {} if @user.credits < Question::UNLOCK_CREDITS || question_already_unlocked?
+      question = Question.find(params[:question_id])
+      return render status: :precondition_failed, json: {} if @user.credits < question.credits_for_unlock(@user) || question_already_unlocked?
       UnlockedQuestion.create(question_id: params[:question_id], user_id: @user.id)
-      @user.update_attributes(credits: @user.credits - Question::UNLOCK_CREDITS)
+      @user.update_attributes(credits: @user.credits - question.credits_for_unlock(@user))
       render status: :ok, json: {}
     end
 

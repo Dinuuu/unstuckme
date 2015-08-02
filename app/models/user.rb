@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+  INITIAL_CREDITS = 20
 	validates :device_token, presence: true, uniqueness: true
   validates :answered_questions, :questions_asked,
             :my_questions_answers, :credits, presence: true,
@@ -11,6 +12,6 @@ class User < ActiveRecord::Base
     self.answered_questions ||= 0
     self.questions_asked ||= 0
     self.my_questions_answers ||= 0
-    self.credits ||= 0
+    self.credits ||= 20
   end
 end
