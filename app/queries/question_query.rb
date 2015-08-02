@@ -11,5 +11,7 @@ class QuestionQuery
              .where.not(creator: user)
              .where(active: true)
              .includes(:options)
+             .order('RANDOM()')
+             .first(20)
   end
 end

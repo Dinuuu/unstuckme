@@ -14,7 +14,7 @@ module V1
     end
 
     def index
-      render status: :ok, json: paginate(QuestionQuery.new(@user.device_token).find)
+      render status: :ok, json: QuestionQuery.new(@user.device_token).find
     end
 
     def show
