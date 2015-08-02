@@ -1,7 +1,6 @@
 module V1
-	class QuestionsController < ApplicationController
+	class QuestionsController < AuthenticatedApiController
     include PaginationHelper
-    before_action :check_user_creation
     before_action :check_ownership, only: [:destroy]
 
     def create
@@ -55,11 +54,6 @@ module V1
 
     def question_already_unlocked?
       UnlockedQuestion.where(question_id: params[:question_id], user_id: @user.id).exists?
-    end
-
-    def check_user_creation
-      user_device = request.headers['TOKEN']
-      @user = User.find_or_create_by(device_token: user_device) if user_device.present?
     end
 
     def check_ownership

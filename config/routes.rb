@@ -9,6 +9,11 @@ Unstuckme::Application.routes.draw do
     	end
       post :unlock
     end
+    resources :users, only: [] do
+      collection do
+        get :show
+      end
+    end
   end
   # root to: 'application#index'
 
