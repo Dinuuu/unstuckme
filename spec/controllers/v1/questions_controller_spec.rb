@@ -5,6 +5,7 @@ describe V1::QuestionsController do
   describe '#create' do
     context 'when creating a valid question' do
       let!(:question_attributes) { attributes_for :question, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }] }
+      before { @request.headers['TOKEN'] = question_attributes[:creator] }
       it 'returns http created' do
         post :create, question: question_attributes
         expect(response.status).to eq 201
@@ -34,7 +35,10 @@ describe V1::QuestionsController do
       let!(:non_exclusive_questions) { create_list :question, 10, exclusive: false, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }] }
 
       let!(:exclusive_questions) { create_list :question, 5, exclusive: true, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }] }
-      before { get :index, user: 'MyDeviceToken' }
+      before :each do
+        @request.headers['TOKEN'] = 'MyDeviceToken'
+        get :index
+      end
       it 'returns all the non exlusive questions' do
         expect(body.all? { |q| q['exclusive'] }).to eq false
       end
@@ -50,6 +54,7 @@ describe V1::QuestionsController do
   describe '#destroy' do
     context 'when destroying my own question' do
       let!(:question) { create :question, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }] }
+      before { @request.headers['TOKEN'] = question.creator }
       it 'destroys the object' do
         expect { delete :destroy, id: question.id, creator: question.creator }.to change(Question, :count).by(-1)
       end
@@ -73,6 +78,7 @@ describe V1::QuestionsController do
     let!(:user) { User.create(device_token: 'QuestionerToken')}
     let!(:questions) { create_list :question, 10, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }], creator: 'QuestionerToken' }
     let!(:vote_params) { { voter: 'VoterDeviceToken', votes: [questions[0].options.first.id, questions[4].options.first.id, questions[6].options.first.id] } }
+    before { @request.headers['TOKEN'] = 'VoterDeviceToken' }
     context 'when voting into a question' do
       it 'returns http created' do
         post :vote, votation: vote_params
@@ -104,7 +110,10 @@ describe V1::QuestionsController do
   describe '#my_questions' do
     context 'when asking for the results of my questions' do
       let!(:questions) { create_list :question, 10, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }], creator: 'myDeviceToken' }
-      before { get :my_questions, user: 'myDeviceToken' }
+      before :each do
+        @request.headers['TOKEN'] = 'myDeviceToken'
+        get :my_questions
+      end
       it 'returns http ok' do
         expect(response.status).to eq 200
       end
@@ -120,12 +129,26 @@ describe V1::QuestionsController do
       let!(:answer1) { Answer.create(question: questions[0], option: questions[0].options[1], voter: 'myDeviceToken')}
       let!(:answer2) { Answer.create(question: questions[2], option: questions[2].options[0], voter: 'myDeviceToken')}
       let!(:answer3) { Answer.create(question: questions[5], option: questions[5].options[1], voter: 'myDeviceToken')}
-      before { get :my_answers, user: 'myDeviceToken' }
+      before :each do
+        @request.headers['TOKEN'] = 'myDeviceToken'
+        get :my_answers
+      end
       it 'returns http ok' do
         expect(response.status).to eq 200
       end
       it 'returns 3 questions' do
         expect(body.size).to eq 3
+      end
+    end
+  end
+
+  describe '#unlock' do
+    let!(:question) { create :question, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }] }
+    let!(:user) { User.create(device_token: 'MyToken', credits: Question::UNLOCK_CREDITS) }
+    before { @request.headers['TOKEN'] = 'MyToken'}
+    context 'when unlocking a locked answer' do
+      it 'increments the amount of unlocked questions' do
+        expect { post :unlock, question_id: question.id}.to change(UnlockedQuestion, :count).by(1)
       end
     end
   end

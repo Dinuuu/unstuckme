@@ -7,6 +7,7 @@ Unstuckme::Application.routes.draw do
     		get :my_questions
     		get :my_answers
     	end
+      post :unlock
     end
   end
   # root to: 'application#index'
