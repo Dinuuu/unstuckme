@@ -36,7 +36,7 @@ class LimitPushContext
 
   def add_request_body(req)
     notification_body[:data][:aps] = aps
-    notification_body[:where][:deviceToken] = Question.find(question_id).creator
+    notification_body[:where][:device_token] = Question.find(question_id).creator
     notification_body[:data][:data][:question_id] = question_id
     req
   end
