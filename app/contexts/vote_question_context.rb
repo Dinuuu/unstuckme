@@ -18,11 +18,20 @@ class VoteQuestionContext
 
   private
 
+  def give_experience_to_question_creator(questioner)
+    level_before = questioner.level
+    questioner.assign_attributes(experience: questioner.experience  + Answer::EXPERIENCE_PER_ANSWER)
+    level_after = questioner.level
+    questioner.assign_attributes(credits: questioner.credits + level_before) if level_after > level_before
+    questioner.save
+  end
+
   def update_question(question)
     new_state = question.total_votes + 1 < question.limit
     question.update_attributes(total_votes: question.total_votes + 1, active: new_state)
     questioner = User.find_by_device_token(question.creator)
-    questioner.update_attributes(my_questions_answers: questioner.my_questions_answers + 1)
+    questioner.assign_attributes(my_questions_answers: questioner.my_questions_answers + 1)
+    give_experience_to_question_creator(questioner)
     LimitPushContext.new(question.id).send unless new_state
   end
 end

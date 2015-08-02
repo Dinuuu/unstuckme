@@ -90,6 +90,12 @@ describe V1::QuestionsController do
       it 'increments the count of my_questions_answers of the questioner' do
         expect { post :vote, vote_params }.to change { User.find_by_device_token('QuestionerToken').my_questions_answers }.by(3)
       end 
+      it 'increments the experience of the questioner' do
+        expect { post :vote, vote_params }.to change { User.find_by_device_token('QuestionerToken').experience }
+      end
+      it 'does not increment the level' do
+        expect { post :vote, vote_params }.not_to change { User.find_by_device_token('QuestionerToken').level }
+      end
       context 'when the user doesn\'t exists' do
         it 'create a new User' do
           expect { post :vote, vote_params }.to change(User, :count).by(1)
@@ -102,6 +108,14 @@ describe V1::QuestionsController do
         end
         it 'increments the count of answered questions of the voter' do
           expect { post :vote, vote_params }.to change { User.find_by_device_token('VoterDeviceToken').answered_questions }.by(3)
+        end
+      end
+    end
+    context 'when voting into a question' do
+      let!(:vote_params2) { { votes: [questions[0].options.first.id, questions[4].options.first.id, questions[6].options.first.id, questions[7].options.first.id ] } }
+      context 'when answering 4 questions to the same questioner' do
+        it 'changes the level' do
+          expect { post :vote, vote_params2 }.to change { User.find_by_device_token('QuestionerToken').level }
         end
       end
     end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150801235129) do
+ActiveRecord::Schema.define(version: 20150802070823) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -63,6 +63,7 @@ ActiveRecord::Schema.define(version: 20150801235129) do
     t.integer  "questions_asked"
     t.integer  "my_questions_answers"
     t.integer  "credits"
+    t.integer  "experience"
   end
 
   add_foreign_key "answers", "options"
