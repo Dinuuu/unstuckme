@@ -6,7 +6,7 @@ class UserSerializer < ActiveModel::Serializer
   	if level == 1
       20
     else
-      20 * (2^(level - 2))
+      20 * (2**(level - 2))
     end
   end
 
