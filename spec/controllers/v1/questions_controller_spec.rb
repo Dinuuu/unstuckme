@@ -109,6 +109,9 @@ describe V1::QuestionsController do
         it 'increments the count of answered questions of the voter' do
           expect { post :vote, vote_params }.to change { User.find_by_device_token('VoterDeviceToken').answered_questions }.by(3)
         end
+        it 'increments the count of credits of the voter' do
+          expect { post :vote, vote_params }.to change { User.find_by_device_token('VoterDeviceToken').answered_questions }.by(3)
+        end
       end
     end
     context 'when voting into a question' do
