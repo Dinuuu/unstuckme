@@ -22,7 +22,10 @@ class VoteQuestionContext
     level_before = questioner.level
     questioner.assign_attributes(experience: questioner.experience  + Answer::EXPERIENCE_PER_ANSWER)
     level_after = questioner.level
-    questioner.assign_attributes(credits: questioner.credits + level_before) if level_after > level_before
+    if level_after > level_before
+      questioner.assign_attributes(credits: questioner.credits + level_before) if level_after > level_before
+      PushContext.new('levelup', questioner.device_token).send
+    end
     questioner.save
   end
 
@@ -32,6 +35,6 @@ class VoteQuestionContext
     questioner = User.find_by_device_token(question.creator)
     questioner.assign_attributes(my_questions_answers: questioner.my_questions_answers + 1)
     give_experience_to_question_creator(questioner)
-    LimitPushContext.new(question.id).send unless new_state
+    PushContext.new('limit', questioner.device_token, question.id).send unless new_state
   end
 end
