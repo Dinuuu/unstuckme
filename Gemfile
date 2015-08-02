@@ -33,10 +33,6 @@ gem 'loadjs'
 gem 'carrierwave'
 gem 'versionist'
 
-gem 'turbolinks'
-
-gem 'jquery-turbolinks'
-
 gem 'devise'
 
 gem 'responders', '2.0'

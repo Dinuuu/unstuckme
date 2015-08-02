@@ -15,7 +15,7 @@ Unstuckme::Application.routes.draw do
       end
     end
   end
-  # root to: 'application#index'
+  root to: 'dashboard#landing'
 
   require 'sidekiq/web'
   mount Sidekiq::Web, at: 'sidekiq'
