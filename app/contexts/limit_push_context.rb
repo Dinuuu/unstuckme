@@ -1,5 +1,5 @@
 class LimitPushContext
-  attr_reader :question_id
+  attr_reader :question_id, :uri, :notification_body
 
   def initialize(question_id)
     @question_id = question_id
