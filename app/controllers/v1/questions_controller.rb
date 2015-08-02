@@ -75,7 +75,8 @@ module V1
     end
 
     def vote_params
-      params.require(:votation).permit(votes:[])
+      params.require(:votes)
+      params.permit(votes:[])
     end
 
     def default_serializer_options  
