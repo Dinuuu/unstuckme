@@ -3,7 +3,7 @@ class User < ActiveRecord::Base
 	validates :device_token, presence: true, uniqueness: true
   validates :answered_questions, :questions_asked,
             :my_questions_answers, :credits, :experience, presence: true,
-            numericality: { integer_only: true, greater_than_or_equal_to: 0 }
+            numericality: { integer_only: true, greater_than_or_equal_to: 0 }          
   after_initialize :initialize_fields
 
   def level

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150802070823) do
+ActiveRecord::Schema.define(version: 20150802151524) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -65,6 +65,8 @@ ActiveRecord::Schema.define(version: 20150802070823) do
     t.integer  "credits"
     t.integer  "experience"
   end
+
+  add_index "users", ["device_token"], name: "index_users_on_device_token", unique: true, using: :btree
 
   add_foreign_key "answers", "options"
   add_foreign_key "answers", "questions"
