@@ -8,6 +8,7 @@ class VoteQuestionContext
   def make_votation
     option = Option.find(vote)
     question = option.question
+    return if voter.device_token == question.creator  
     option.update_attributes(votes: option.votes + 1)
     if question.active?
       update_question(question)
