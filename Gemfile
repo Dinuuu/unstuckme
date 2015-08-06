@@ -69,7 +69,6 @@ gem 'meta-tags'
 gem 'pghero'
 
 # SEO Meta Tags
-gem 'metamagic'
 
 group :development do
 
@@ -107,7 +106,6 @@ group :development, :test do
 
   # Lints
   gem 'rubocop'
-  gem 'scss_lint'
 end
 
 group :test do

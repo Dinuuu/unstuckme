@@ -1,5 +1,7 @@
 Unstuckme::Application.routes.draw do
 
+  devise_for :admin_users, ActiveAdmin::Devise.config
+  ActiveAdmin.routes(self)
   api_version(module: "V1", path: { value: 'api/v1' }, defaults: { format: :json })  do
     resources :questions, only: [:create, :destroy, :show, :index] do
     	collection do

@@ -35,11 +35,11 @@ module V1
     end
 
     def my_questions
-      render status: :ok, json: paginate(Question.for_user(@user))
+      render status: :ok, json: paginate_collection(Question.for_user(@user))
     end
 
     def my_answers
-      render status: :ok, json: paginate(Question.where(id: Answer.for_user(@user)
+      render status: :ok, json: paginate_collection(Question.where(id: Answer.for_user(@user)
                                          .pluck(:question_id)))
     end
 
