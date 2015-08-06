@@ -4,7 +4,7 @@ module V1
     before_action :check_ownership, only: [:destroy]
 
     def create
-      @question = Question.new(questions_params.merge(creator: @user.device_token))
+      @question = Question.new(questions_params.merge(user: @user))
       if question.save
         @user.update_attributes(questions_asked: @user.questions_asked + 1)
         render status: :created, json: question
@@ -14,7 +14,7 @@ module V1
     end
 
     def index
-      render status: :ok, json: QuestionQuery.new(@user.device_token).find
+      render status: :ok, json: QuestionQuery.new(@user).find
     end
 
     def show
@@ -35,11 +35,11 @@ module V1
     end
 
     def my_questions
-      render status: :ok, json: paginate(Question.for_user(@user.device_token))
+      render status: :ok, json: paginate(Question.for_user(@user))
     end
 
     def my_answers
-      render status: :ok, json: paginate(Question.where(id: Answer.where(voter: @user.device_token)
+      render status: :ok, json: paginate(Question.where(id: Answer.for_user(@user)
                                          .pluck(:question_id)))
     end
 
@@ -58,7 +58,7 @@ module V1
     end
 
     def check_ownership
-      render status: :forbidden, json: {} unless params[:creator] == question.creator
+      render status: :forbidden, json: {} unless question.user == @user
     end
 
     def question

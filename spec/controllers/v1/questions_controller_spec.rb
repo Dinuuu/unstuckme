@@ -4,8 +4,8 @@ describe V1::QuestionsController do
   let(:body) { JSON.parse(response.body) if response.body.present? }
   describe '#create' do
     context 'when creating a valid question' do
-      let!(:question_attributes) { attributes_for :question, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }] }
-      before { @request.headers['TOKEN'] = question_attributes[:creator] }
+      let!(:question_attributes) { attributes_for :question, user: nil, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }] }
+      before { @request.headers['TOKEN'] = 'deviseToken' }
       it 'returns http created' do
         post :create, question: question_attributes
         expect(response.status).to eq 201
@@ -19,7 +19,7 @@ describe V1::QuestionsController do
         end
       end
       context 'when the user exists' do
-        let!(:user) { User.create(device_token: question_attributes[:creator]) }
+        let!(:user) { User.create(device_token: 'deviseToken') }
         it 'does not creates a new User' do
           expect { post :create, question: question_attributes }.not_to change { User.count }
         end
@@ -54,9 +54,9 @@ describe V1::QuestionsController do
   describe '#destroy' do
     context 'when destroying my own question' do
       let!(:question) { create :question, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }] }
-      before { @request.headers['TOKEN'] = question.creator }
+      before { @request.headers['TOKEN'] = question.user.device_token }
       it 'destroys the object' do
-        expect { delete :destroy, id: question.id, creator: question.creator }.to change(Question, :count).by(-1)
+        expect { delete :destroy, id: question.id }.to change(Question, :count).by(-1)
       end
     end
   end
@@ -76,7 +76,7 @@ describe V1::QuestionsController do
 
   describe '#vote' do
     let!(:user) { User.create(device_token: 'QuestionerToken')}
-    let!(:questions) { create_list :question, 10, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }], creator: 'QuestionerToken' }
+    let!(:questions) { create_list :question, 10, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }], user: user }
     let!(:vote_params) { { votes: [questions[0].options.first.id, questions[4].options.first.id, questions[6].options.first.id] } }
     before { @request.headers['TOKEN'] = 'VoterDeviceToken' }
     context 'when voting into a question' do
@@ -126,9 +126,10 @@ describe V1::QuestionsController do
 
   describe '#my_questions' do
     context 'when asking for the results of my questions' do
-      let!(:questions) { create_list :question, 10, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }], creator: 'myDeviceToken' }
+      let!(:user) { User.create(device_token: 'QuestionerToken')}
+      let!(:questions) { create_list :question, 10, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }], user: user }
       before :each do
-        @request.headers['TOKEN'] = 'myDeviceToken'
+        @request.headers['TOKEN'] = 'QuestionerToken'
         get :my_questions
       end
       it 'returns http ok' do
@@ -142,12 +143,13 @@ describe V1::QuestionsController do
 
   describe '#my_answers' do
     context 'when asking for the questions I\'ve answered' do
+      let!(:user) { User.create(device_token: 'VoterToken')}
       let!(:questions) { create_list :question, 10, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }] }
-      let!(:answer1) { Answer.create(question: questions[0], option: questions[0].options[1], voter: 'myDeviceToken')}
-      let!(:answer2) { Answer.create(question: questions[2], option: questions[2].options[0], voter: 'myDeviceToken')}
-      let!(:answer3) { Answer.create(question: questions[5], option: questions[5].options[1], voter: 'myDeviceToken')}
+      let!(:answer1) { Answer.create(question: questions[0], option: questions[0].options[1], user: user) }
+      let!(:answer2) { Answer.create(question: questions[2], option: questions[2].options[0], user: user) }
+      let!(:answer3) { Answer.create(question: questions[5], option: questions[5].options[1], user: user) }
       before :each do
-        @request.headers['TOKEN'] = 'myDeviceToken'
+        @request.headers['TOKEN'] = 'VoterToken'
         get :my_answers
       end
       it 'returns http ok' do
