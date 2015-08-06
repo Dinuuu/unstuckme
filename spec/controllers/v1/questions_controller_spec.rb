@@ -3,8 +3,8 @@ require 'rails_helper'
 describe V1::QuestionsController do
   let(:body) { JSON.parse(response.body) if response.body.present? }
   describe '#create' do
+    let!(:question_attributes) { attributes_for :question, user: nil, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }] }
     context 'when creating a valid question' do
-      let!(:question_attributes) { attributes_for :question, user: nil, options_attributes: [{ option: Faker::Avatar.image },{ option: Faker::Avatar.image }] }
       before { @request.headers['TOKEN'] = 'deviseToken' }
       it 'returns http created' do
         post :create, question: question_attributes
@@ -25,6 +25,20 @@ describe V1::QuestionsController do
         end
         it 'increments the count of questions_asked by 1' do
           expect { post :create, question: question_attributes }.to change { user.reload.questions_asked }.by(1)
+        end
+      end
+      context 'when it has category' do
+        let!(:category) { create :category }
+        before { question_attributes[:category_id] = category.id }
+        it 'returns http created' do
+          post :create, question: question_attributes
+          expect(response.status).to eq 201
+        end
+        it 'creates a new Question' do
+          expect { post :create, question: question_attributes }.to change(Question, :count).by(1)
+        end
+        it 'adds a question to the category' do
+          expect { post :create, question: question_attributes }.to change { category.reload.questions.count }.by(1)
         end
       end
     end

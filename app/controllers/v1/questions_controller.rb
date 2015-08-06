@@ -66,7 +66,7 @@ module V1
     end
 
     def questions_params
-      params.require(:question).permit(:exclusive, :limit, options_attributes: [:option])
+      params.require(:question).permit(:exclusive, :limit, :category_id, options_attributes: [:option])
     end
 
     def vote_params

@@ -1,5 +1,9 @@
 class QuestionSerializer < ActiveModel::Serializer
-  attributes :id, :options, :unlocked
+  attributes :id, :options, :unlocked, :category
+
+  def category
+  	object.category.try(:name)
+  end
 
   def options
   	ActiveModel::ArraySerializer

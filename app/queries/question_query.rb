@@ -6,12 +6,10 @@ class QuestionQuery
   end
 
   def find
-    @relation.where(exclusive: false)
-             .where.not(id: Answer.where(user: user).pluck(:question_id))
-             .where.not(user: user)
-             .where(active: true)
-             .includes(:options)
-             .order('RANDOM()')
-             .first(20)
+    relation.not_exclusive.not_mine(user).active
+            .not_answered(user)
+            .includes(:options, :category)
+            .order('RANDOM()')
+            .first(20)
   end
 end

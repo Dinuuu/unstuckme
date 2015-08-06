@@ -6,6 +6,7 @@ class Question < ActiveRecord::Base
   has_many :options, inverse_of: :question, dependent: :destroy
   accepts_nested_attributes_for :options
   belongs_to :user
+  belongs_to :category
   validates :user, :limit, presence: true
   validates :exclusive, inclusion: { in: [true, false] }
   validates :options, length: { minimum: MIN_OPTIONS, maximum: MAX_OPTIONS }
@@ -14,8 +15,10 @@ class Question < ActiveRecord::Base
   validates :active, inclusion: { in: [true, false] }
 
   scope :for_user, -> (user) { where(user: user) }
-
-
+  scope :not_exclusive, -> { where(exclusive: false) }
+  scope :active, -> { where(active: true) }
+  scope :not_mine, -> (user) { where.not(user: user) }
+  scope :not_answered, -> (user) { where.not(id: Answer.where(user: user).pluck(:question_id)) }
   after_initialize :initialize_fields
 
   def credits_for_unlock(creator)
